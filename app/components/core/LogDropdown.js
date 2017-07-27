@@ -95,7 +95,7 @@ class LogDropdown extends Component{
     }
 
     onDropDownClick = () => {
-        console.log('button is clickable-----');
+        //console.log('button is clickable-----');
         if(this.state.openList === false){
             this.setState({
                 displayMenuItems: true,
@@ -111,8 +111,9 @@ class LogDropdown extends Component{
 
     }
 
-    onMenuItemSelect = (selectedMenuItem) => {
-        this.setState({
+    /*onMenuItemSelect = (selectedMenuItem) => {
+        console.log('1111111111111', selectedMenuItem);
+        /!*this.setState({
             selectedListItem:selectedMenuItem
         },() => {
             this.setState({
@@ -120,12 +121,11 @@ class LogDropdown extends Component{
                 openList: false,
             })
             this.props.selectedValue(this.state.selectedListItem);
-        })
-    }
+        })*!/
+    };*/
 
     render(){
-        console.log('props',this.props);
-        let dataArray = this.props.data
+        let dataArray = this.props.data;
         /*let selectobject = this.props;
         let array =[];
         for (let i in selectobject) {
@@ -134,7 +134,15 @@ class LogDropdown extends Component{
         }*/
         return(
             <div>
-                {
+                <DropdownButton title={this.props.title}>
+                   {dataArray.map((item, index) => {
+                        return (<MenuItem eventKey={index+1} onSelect={() => this.props.onSelect(item)}>{item}
+                        </MenuItem>)
+
+                    })}
+                </DropdownButton>
+
+                {/*{
                     this.state.openList === true?
                         <div className="main-dropdown">
                             <button
@@ -154,7 +162,7 @@ class LogDropdown extends Component{
                                     className="drop-button">{this.state.selectedListItem}
                                 <span className="glyphicon glyphicon-chevron-down"></span></button>
                         </div>
-                }
+                }*/}
             </div>
         )
     }

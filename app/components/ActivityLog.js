@@ -3,34 +3,166 @@
  */
 
 import React, { Component } from 'react'
-import ActivityLogHeader from './core/ActivityLogHeader'
 import ActivityLogRow from './core/ActivityLogRow'
-import { Grid, Row, Col } from 'react-bootstrap'
+import { Grid, Row, Col } from 'react-bootstrap';
+import SampleData from './../components/assets/SampleData';
 
 class ActivityLog extends Component{
+    constructor(props){
+        super(props);
+        this.state = {
+            timeEnteries: SampleData,
+        }
+    }
+
+    newEntry = (newTimeLog,date,newLogStatus) => {
+        this.state.timeEnteries.map((item) => {
+            if(item.date === date){
+                item.status = newLogStatus;
+                item.activities.map((childItem) => {
+                    if(childItem.Status === 'New'){
+                        childItem.Id = newTimeLog.Id;
+                        childItem.Activity = newTimeLog.Activity;
+                        childItem.Type = newTimeLog.Type;
+                        childItem.Duration = newTimeLog.Duration;
+                        childItem.Description = newTimeLog.Description;
+                        childItem.Status = newTimeLog.Status;
+                    }
+                })
+            }
+        })
+
+
+        this.setState({
+            timeEnteries: this.state.timeEnteries
+        })
+    }
+
+    clearAllLogs = (allLogs,date) => {
+        this.state.timeEnteries.map((entry) => {
+            if(entry.date === date){
+                entry.activities.splice(0,entry.activities.length);
+            }
+        })
+        this.setState({
+            timeEnteries:this.state.timeEnteries
+        })
+
+    };
+
+    addNewLog = (item) => {
+      this.state.timeEnteries.map((entry) => (entry.date == item.date && entry.status === 'committed') ?
+          (entry.status = 'uncommitted',
+              entry.activities.unshift({
+                  "Id":"",
+                  "Activity":"",
+                  "Type": "",
+                  "Duration": "",
+                  "Description": "",
+                  "Status": "New"
+              }) ): null
+      );
+      this.setState({
+          timeEnteries: this.state.timeEnteries
+      });
+    };
+
+    edittedLog = (editItem,date) => {
+        this.state.timeEnteries.map((entry) => {
+            if(entry.date === date){
+                entry.activities.map((childItem) => {
+                    if(childItem.Id === editItem.Id){
+                        childItem.Activity = editItem.Activity;
+                        childItem.Type = editItem.Type;
+                        childItem.Duration = editItem.Duration;
+                        childItem.Description = editItem.Description;
+                        childItem.Status = editItem.Status;
+                    }
+                })
+            }
+        })
+        this.setState({
+            timeEnteries: this.state.timeEnteries
+        })
+    }
+
+    deleteEntry = (deletedEntry,logDate) => {
+        this.state.timeEnteries.map((entry) => {
+            if(entry.date === logDate){
+                entry.activities.map((childEntry) => {
+                    if(childEntry.Id === deletedEntry.Id){
+                        console.log('ids--------------',entry.activities.indexOf(childEntry));
+                        entry.activities.splice(entry.activities.indexOf(childEntry),1);
+                    }
+                })
+            }
+        })
+        this.setState({
+            timeEnteries:this.state.timeEnteries
+        })
+    }
+
+    closedWithoutCreate = (newLogStatus,logDate) => {
+        this.state.timeEnteries.map((entry) => {
+            if(entry.date === logDate){
+                entry.status = 'committed';
+                entry.activities.map((childEntry) => {
+                    childEntry.Status === 'New'? entry.activities.splice(entry.activities.indexOf(childEntry),1):null
+                })
+            }
+        })
+        this.setState({
+            timeEnteries:this.state.timeEnteries
+        })
+    }
+
     render(){
+        let headingArray = [
+            {
+                md:1,
+                lg: 1,
+                title: 'Activity'
+            },
+            {
+                md:2,
+                lg: 2,
+                title: 'Type'
+            },
+            {
+                md: 1,
+                lg: 1,
+                title: 'Duration'
+            },
+            {
+                md:3,
+                lg: 3,
+                title: 'Description'
+            },
+            {
+                md:1,
+                lg: 1,
+                title: 'Status'
+            }
+        ]
         return(
             <div>
                 <Grid>
                     <Row className="show-grid">
-                        <Col md={1} lg={1} className="log-col">
-                            <h4>Activity</h4>
-                        </Col>
-                        <Col md={2} lg={2} className="log-col">
-                            <h4>Type</h4>
-                        </Col>
-                        <Col md={1} lg={1} className="log-col">
-                            <h4>Duration</h4>
-                        </Col>
-                        <Col md={3} lg={3} className="log-col">
-                            <h4>Description</h4>
-                        </Col>
-                        <Col md={1} lg={1} className="log-col">
-                            <h4>Status</h4>
-                        </Col>
+                        {headingArray.map(item =>{
+                            return (
+                            <Col md={item.md} lg={item.lg} className="log-col">
+                                <h4>{item.title}</h4>
+                            </Col>
+                        )})
+                        }
                     </Row>
-                    <ActivityLogHeader/>
-                    <ActivityLogRow/>
+                    <ActivityLogRow timeLog={this.state.timeEnteries}
+                                    logItem={(item, timeLogStatus) => this.addNewLog(item, timeLogStatus)}
+                                    newEntry={(newTimeLog,date,newLogStatus) => {this.newEntry(newTimeLog,date,newLogStatus)}}
+                                    onClearClick={(allLogs,date) => {this.clearAllLogs(allLogs,date)}}
+                                    edittedLog={(editItem,date) => {this.edittedLog(editItem,date)}}
+                                    deleteEntry={(deletedEntry,logDate) => {this.deleteEntry(deletedEntry,logDate)}}
+                                    closedWithoutCreate={(newLogStatus,logDate) => {this.closedWithoutCreate(newLogStatus,logDate)}}/>
                 </Grid>
             </div>
         );

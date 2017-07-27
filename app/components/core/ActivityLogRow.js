@@ -5,12 +5,15 @@ import React, { Component } from 'react'
 import { Row, Col } from 'react-bootstrap'
 import sampleData from '../assets/SampleData'
 import ActivityLogComp from './ActivityLogComp'
+import NewLogComp from './NewLogComp'
+import ActivityLogHeader from './ActivityLogHeader'
+import TSMS_TextButton from './TSMS_TextButton'
 import editIcon from '../assets/images/editIcon.png'
 import deleteIcon from '../assets/images/deleteIcon.jpg'
 
 class ActivityLogRow extends Component{
-    constructor(){
-        super();
+    constructor(props){
+        super(props);
         this.state = {
             activity:'',
             type:'',
@@ -20,42 +23,57 @@ class ActivityLogRow extends Component{
         }
     }
 
-    render(){
-        console.log('sample data---------',sampleData);
-        console.log('state in activityRow------',this.state);
-        return(
-            <Row className="show-grid">
-                        {sampleData.map((item) => {
-                            return (
-                                <ActivityLogComp activity={item.Activity}
-                                                 type={item.Type}
-                                                 duration={item.Duration}
-                                                 desc={item.Description}
-                                                 status={item.Status} sampleData={sampleData}/>
-                            )
-                        })}
-                {/*<Col md={1} lg={1} className="log-col">
-                    {this.state.editBtn === 'true'?
-                        <LogDropdown/>:<span>Project</span>
-                    }
-                </Col>
-                <Col md={2} lg={2} className="log-col">
-                    {this.state.editBtn === 'true'?
-                        <LogDropdown/>:<span>Westcon</span>
-                    }
-                </Col>
-                <Col md={1} lg={1} className="log-col">
-                    {this.state.editBtn === 'true'?
-                        <LogDropdown/>:<span>30 mins</span>
-                    }
-                </Col>
-                <Col md={3} lg={3} className="log-col">
-                    {this.state.editBtn === 'true'?
-                        <input type="text"/>:<span>Sync meeting- Westcon!!!!!</span>
-                    }
-                </Col>*/}
+    newLogData = (newObj, date, newLogStatus) => {
+        this.props.newEntry(newObj,date, newLogStatus);
+    };
 
-            </Row>
+    /*onClearClick = () => {
+        console.log('clear all data------------------->>>>');
+        //sampleData.splice(0,sampleData.length);
+        //console.log('------------------',sampleData);
+    }*/
+
+
+
+    deleteEntry = (deletedEntry,logDate) => {
+        this.props.deleteEntry(deletedEntry,logDate);
+    }
+
+    render(){
+        return(
+            <div>
+                {
+                    this.props.timeLog.map((item, index) => {
+                        return (
+                            <div key={index}>
+                                <ActivityLogHeader logDate={item.date}
+                                                   onLogTimeClick={() => this.props.logItem(item)}
+                                                   onClearClick={() => this.props.onClearClick(item,item.date)}/>
+                                <Row className="show-grid">
+                                    {/*{(this.state.newEntry === true)?
+                                        <NewLogComp sampleData={item.activities} newLogCreated={(newLog) => this.newLogData(newLog,item.date)}/>:null
+                                    }*/}
+                                    {item.activities.map((activity) => {
+                                        return ((activity.Status == 'New') ? <NewLogComp sampleData={item.activities}
+                                                                                         sampleDataStatus={item.status}
+                                                                                         newLogCreated={(newLog,newLogStatus) => this.newLogData(newLog,item.date,newLogStatus)}
+                                                                                         closedWithoutCreate={(newLogStatus) => {this.props.closedWithoutCreate(newLogStatus,item.date)}}/> :
+                                            <ActivityLogComp activity={activity}
+                                                             sampleData={item.activities}
+                                                             deleteEntry={(deletedEntry) => {this.deleteEntry(deletedEntry,item.date)}}
+                                                             edittedLog={(editLog) => {this.props.edittedLog(editLog, item.date)}}
+                                            />
+                                        )
+                                    })}
+                                </Row>
+                            </div>
+                        )
+                    })
+                }
+
+
+
+            </div>
         );
     }
 }

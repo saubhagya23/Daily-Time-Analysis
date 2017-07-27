@@ -5,31 +5,24 @@
 import React, { Component } from 'react'
 import { Col } from 'react-bootstrap'
 import LogDropdown from './LogDropdown'
+import TSMS_IconButton from './TSMS_IconButton'
 
 class ActivityLogComp extends Component{
-    constructor(){
-        super();
-
+    constructor(props){
+        super(props);
+        const activity = this.props.activity;
         this.state = {
             editBtn:'false',
-            deleteBtn: 'false',
-            selectedValue: '',
-            activity: '',
-            type:'',
-            duration:'',
-            desc:'',
-            status:''
+            id: activity.Id,
+            activity: activity.Activity,
+            type:activity.Type,
+            duration: activity.Duration,
+            desc: activity.Description,
+            status: activity.Status,
+            projectName: activity.Type,
+            projectCategory: activity.Activity,
+            logDuration: activity.Duration
         }
-    }
-
-    componentWillMount = () => {
-        this.setState({
-            activity: this.props.activity,
-            type: this.props.type,
-            duration:this.props.duration,
-            desc:this.props.desc,
-            status:this.props.status
-        })
     }
 
     onEditClick = () => {
@@ -40,8 +33,23 @@ class ActivityLogComp extends Component{
 
     onOkClick = () => {
         this.setState({
-            editBtn:'false'
+            editBtn:'false',
+            activity: this.state.projectCategory,
+            type: this.state.projectName,
+            duration: this.state.logDuration,
+        }, ()=> {
+            let edittedLog = {
+                Id: this.state.id,
+                Activity: this.state.activity,
+                Type: this.state.type,
+                Duration: this.state.duration,
+                Description: this.state.desc,
+                Status: this.state.status
+            }
+            this.props.edittedLog(edittedLog);
+
         })
+
     }
 
     onEditDeleteClick = () => {
@@ -50,33 +58,28 @@ class ActivityLogComp extends Component{
         })
     }
 
-    onDeleteClick = () => {
-        if(this.state.deleteBtn === 'false'){
-            this.setState({
-                deleteBtn:'true'
-            })
-        }
-        else{
-            this.setState({
-                deleteBtn:'false'
-            })
-        }
+    onDeleteClick = (activity) => {
+        console.log('data to be deleted----------->>>',activity);
+
+        this.props.deleteEntry(activity);
     }
 
-    getSeletedValue = (selectedItem) => {
+
+    setSelectedValue = (item, property) => {
         this.setState({
-            selectedValue: selectedItem
-        },() => {
-            console.log('value in activityLogComp------------------',this.state.selectedValue);
+            [property]: item
         })
     }
 
-    onSelectChanged = (selected) => {
+    onDescChange = (event) => {
+        this.setState({
+            desc: event.target.value
+        })
 
     }
 
     render(){
-        console.log('props got=================',this.props.sampleData);
+        const activity = this.props.activity;
         let sampleData = this.props.sampleData;
         let activityArray = [], typeArray = [], durationArray = [];
         sampleData.forEach(function(item){
@@ -84,10 +87,6 @@ class ActivityLogComp extends Component{
             typeArray.push(item.Type);
             durationArray.push(item.Duration);
         })
-        /*for(let i=0;i<sampleData.length; i++){
-            console.log('*****************',sampleData[0]);
-        }*/
-        console.log('------------array----------------',activityArray,' ',typeArray,' ',durationArray);
         let activityCategory = ['Project','Non-Project'];
         let durationTime = ['30 mins','1 hr','2 hrs','3 hrs','4 hrs','5 hrs','6 hrs','7 hrs','8 hrs'];
 
@@ -96,65 +95,75 @@ class ActivityLogComp extends Component{
                 {this.state.editBtn === 'true'?
                     <div className="data-div">
                         <Col md={1} lg={1} className="log-col">
-                            <LogDropdown className='activity' data={activityCategory} selectedValue={this.getSeletedValue}/>
+                            <LogDropdown className='activity'
+                                         title={this.state.projectCategory}
+                                         data={activityCategory}
+                                         onSelect={(item) => {this.setSelectedValue(item, 'projectCategory')}}/>
                         </Col>
                         <Col md={2} lg={2} className="log-col">
-                            <LogDropdown className='type' data={typeArray} selectedValue={this.getSeletedValue}/>
+                            <LogDropdown className='type'
+                                         data={typeArray}
+                                         title={this.state.projectName}
+                                         onSelect={(item) => this.setSelectedValue(item, 'projectName')}/>
                         </Col>
                         <Col md={1} lg={1} className="log-col">
-                            <LogDropdown className="duration" data={durationTime} selectedValue={this.getSeletedValue}/>
+                           <LogDropdown className="duration"
+                                        title={this.state.logDuration}
+                                        data={durationTime} onSelect={(item) => {this.setSelectedValue(item, 'logDuration')}}/>
                         </Col>
                         <Col md={3} lg={3} className="log-col">
-                            <input type="text" value={this.props.desc}/>
+                            <input type="text" value={this.state.desc} onChange={this.onDescChange.bind(this)}/>
                         </Col>
                         <Col md={1} lg={1} className="log-col">
-                            <span>{this.props.status}</span>
+                            <span>{this.state.status}</span>
                         </Col>
                         <Col md={2} lg={2} lgOffset={1} className="log-col">
-                            {/* <button className="edit-clear-button"><img src={editIcon}/></button>
-                             <button className="edit-clear-button"><img src={deleteIcon}/></button>*/}
+                            <TSMS_IconButton bClassName="btn btn-default btn-sm edit-clear-button"
+                                             onClickFunc={() => this.onOkClick()}
+                                             spanClass="glyphicon glyphicon-ok"/>
 
-                            <button type="button" className="btn btn-default btn-sm edit-clear-button" onClick={this.onOkClick.bind(this)}>
-                                <span className="glyphicon glyphicon-ok"></span>
-                            </button>
-                            <button type="button" className="btn btn-default btn-sm edit-clear-button" onClick={this.onEditDeleteClick.bind(this)}>
-                                <span className="glyphicon glyphicon-remove"></span>
-                            </button>
+                            <TSMS_IconButton bClassName="btn btn-default btn-sm edit-clear-button"
+                                             onClickFunc={() => this.onEditDeleteClick()}
+                                             spanClass="glyphicon glyphicon-remove"/>
+
+
 
                         </Col>
                     </div>:
                     <div>
-                    {this.state.deleteBtn === 'false'?
+                    {/*{this.state.deleteBtn === 'false'?*/}
                         <div className="data-div">
                             <Col md={1} lg={1} className="log-col">
-                                <span>{this.props.activity}</span>
+                                <span>{activity.Activity}</span>
                             </Col>
                             <Col md={2} lg={2} className="log-col">
-                                <span>{this.props.type}</span>
+                                <span>{activity.Type}</span>
                             </Col>
                             <Col md={1} lg={1} className="log-col">
-                                <span>{this.props.duration}</span>
+                                <span>{activity.Duration}</span>
                             </Col>
                             <Col md={3} lg={3} className="log-col">
-                                <span>{this.props.desc}</span>
+                                <span>{activity.Description}</span>
                             </Col>
                             <Col md={1} lg={1} className="log-col">
-                                <span>{this.props.status}</span>
+                                <span>{activity.Status}</span>
                             </Col>
                             <Col md={2} lg={2} lgOffset={1} className="log-col">
                                 {/* <button className="edit-clear-button"><img src={editIcon}/></button>
                                  <button className="edit-clear-button"><img src={deleteIcon}/></button>*/}
 
-                                <button type="button" className="btn btn-default btn-sm edit-clear-button" onClick={this.onEditClick.bind(this)}>
-                                    <span className="glyphicon glyphicon-pencil"></span>
-                                </button>
-                                <button type="button" className="btn btn-default btn-sm edit-clear-button" onClick={this.onDeleteClick.bind(this)}>
-                                    <span className="glyphicon glyphicon-remove"></span>
-                                </button>
+                                <TSMS_IconButton bClassName="btn btn-default btn-sm edit-clear-button"
+                                                 onClickFunc={() => this.onEditClick()}
+                                                 spanClass="glyphicon glyphicon-pencil"/>
+
+                                <TSMS_IconButton bClassName="btn btn-default btn-sm edit-clear-button"
+                                                 onClickFunc={() => this.onDeleteClick(activity)}
+                                                 spanClass="glyphicon glyphicon-remove"/>
+
 
                             </Col>
-                        </div>:''
-                    }
+                        </div>{/*:''
+                    }*/}
                     </div>
                 }
             </div>
