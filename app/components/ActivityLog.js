@@ -90,12 +90,15 @@ class ActivityLog extends Component{
     deleteEntry = (deletedEntry,logDate) => {
         this.state.timeEnteries.map((entry) => {
             if(entry.date === logDate){
-                entry.activities.map((childEntry) => {
+                console.log('ids--------------',entry.activities.indexOf(deletedEntry))
+                entry.activities.splice(entry.activities.indexOf(deletedEntry),1);
+
+                /*entry.activities.map((childEntry) => {
                     if(childEntry.Id === deletedEntry.Id){
                         console.log('ids--------------',entry.activities.indexOf(childEntry));
                         entry.activities.splice(entry.activities.indexOf(childEntry),1);
                     }
-                })
+                })*/
             }
         })
         this.setState({
