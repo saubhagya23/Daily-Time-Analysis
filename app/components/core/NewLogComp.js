@@ -6,6 +6,8 @@ import React, { Component } from 'react'
 import { Row, Col } from 'react-bootstrap'
 import LogDropdown from './LogDropdown'
 import TSMS_IconButton from './TSMS_IconButton'
+import {TimeEntryStatus} from '../../../constants/Index'
+
 
 class NewLogComp extends Component{
     constructor(){
@@ -16,7 +18,7 @@ class NewLogComp extends Component{
             newLogType: 'Select',
             newLogDuration: 'Select',
             newLogDesc: '',
-            newLogStatus: 'Pending',
+            newLogStatus: TimeEntryStatus.Pending,
             display: true,
 
         }
@@ -42,7 +44,7 @@ class NewLogComp extends Component{
                 Description: this.state.newLogDesc,
                 Status: this.state.newLogStatus
             }
-            newLogStatus = 'committed';
+            newLogStatus = TimeEntryStatus.Committed;
             this.props.newLogCreated(newLogObj,newLogStatus);
 
 
@@ -51,7 +53,7 @@ class NewLogComp extends Component{
                 newLogType: 'Select',
                 newLogDuration: 'Select',
                 newLogDesc: '',
-                newLogStatus: 'Pending',
+                newLogStatus: TimeEntryStatus.Pending,
             })
         }
 
@@ -65,12 +67,12 @@ class NewLogComp extends Component{
                 newLogType: 'Select',
                 newLogDuration: 'Select',
                 newLogDesc: '',
-                newLogStatus: 'Pending',
+                newLogStatus: TimeEntryStatus.Pending,
             },() => {
                 console.log('no new entry created');
             })
             let newLogStatus = this.props.sampleDataStatus;
-            newLogStatus = 'committed';
+            newLogStatus = TimeEntryStatus.Committed;
             this.props.closedWithoutCreate(newLogStatus);
         }
 

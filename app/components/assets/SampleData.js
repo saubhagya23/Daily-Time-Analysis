@@ -1,3 +1,5 @@
+import { TimeEntryStatus } from '../../../constants/Index'
+
 let SampleData = [
     {
         date: '24/07/2017',
@@ -26,7 +28,7 @@ let SampleData = [
                 "Description": "Project DTA sync - meeting!!!!!!!!!!!!",
                 "Status": "Pending"
             }],
-        status:'committed'
+        status: TimeEntryStatus.Committed
     },
     {
         date: '23/07/2017',
@@ -48,7 +50,7 @@ let SampleData = [
                 "Status": "Pending"
             }
         ],
-        status:'committed'
+        status: TimeEntryStatus.Committed
     }
 ];
 

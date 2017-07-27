@@ -7,6 +7,8 @@ import sampleData from '../assets/SampleData'
 import ActivityLogComp from './ActivityLogComp'
 import NewLogComp from './NewLogComp'
 import ActivityLogHeader from './ActivityLogHeader'
+import {TimeEntryStatus} from '../../../constants/Index'
+
 import TSMS_TextButton from './TSMS_TextButton'
 import editIcon from '../assets/images/editIcon.png'
 import deleteIcon from '../assets/images/deleteIcon.jpg'
@@ -19,7 +21,7 @@ class ActivityLogRow extends Component{
             type:'',
             duration:'',
             description:'',
-            status:'Pending',
+            status: TimeEntryStatus.Pending,
         }
     }
 
@@ -54,7 +56,7 @@ class ActivityLogRow extends Component{
                                         <NewLogComp sampleData={item.activities} newLogCreated={(newLog) => this.newLogData(newLog,item.date)}/>:null
                                     }*/}
                                     {item.activities.map((activity) => {
-                                        return ((activity.Status == 'New') ? <NewLogComp sampleData={item.activities}
+                                        return ((activity.Status == TimeEntryStatus.New) ? <NewLogComp sampleData={item.activities}
                                                                                          sampleDataStatus={item.status}
                                                                                          newLogCreated={(newLog,newLogStatus) => this.newLogData(newLog,item.date,newLogStatus)}
                                                                                          closedWithoutCreate={(newLogStatus) => {this.props.closedWithoutCreate(newLogStatus,item.date)}}/> :

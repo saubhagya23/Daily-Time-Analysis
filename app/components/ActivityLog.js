@@ -5,7 +5,8 @@
 import React, { Component } from 'react'
 import ActivityLogRow from './core/ActivityLogRow'
 import { Grid, Row, Col } from 'react-bootstrap';
-import SampleData from './../components/assets/SampleData';
+import SampleData from './../components/assets/SampleData'
+import { TimeEntryStatus, HeadingArray } from '../../constants/Index'
 
 class ActivityLog extends Component{
     constructor(props){
@@ -20,7 +21,7 @@ class ActivityLog extends Component{
             if(item.date === date){
                 item.status = newLogStatus;
                 item.activities.map((childItem) => {
-                    if(childItem.Status === 'New'){
+                    if(childItem.Status === TimeEntryStatus.New){
                         childItem.Id = newTimeLog.Id;
                         childItem.Activity = newTimeLog.Activity;
                         childItem.Type = newTimeLog.Type;
@@ -51,15 +52,15 @@ class ActivityLog extends Component{
     };
 
     addNewLog = (item) => {
-      this.state.timeEnteries.map((entry) => (entry.date == item.date && entry.status === 'committed') ?
-          (entry.status = 'uncommitted',
+      this.state.timeEnteries.map((entry) => (entry.date == item.date && entry.status === TimeEntryStatus.Committed) ?
+          (entry.status = TimeEntryStatus.Uncommitted,
               entry.activities.unshift({
                   "Id":"",
                   "Activity":"",
                   "Type": "",
                   "Duration": "",
                   "Description": "",
-                  "Status": "New"
+                  "Status": TimeEntryStatus.New
               }) ): null
       );
       this.setState({
@@ -105,9 +106,9 @@ class ActivityLog extends Component{
     closedWithoutCreate = (newLogStatus,logDate) => {
         this.state.timeEnteries.map((entry) => {
             if(entry.date === logDate){
-                entry.status = 'committed';
+                entry.status = TimeEntryStatus.Committed;
                 entry.activities.map((childEntry) => {
-                    childEntry.Status === 'New'? entry.activities.splice(entry.activities.indexOf(childEntry),1):null
+                    childEntry.Status === TimeEntryStatus.New ? entry.activities.splice(entry.activities.indexOf(childEntry),1):null
                 })
             }
         })
@@ -117,38 +118,11 @@ class ActivityLog extends Component{
     }
 
     render(){
-        let headingArray = [
-            {
-                md:1,
-                lg: 1,
-                title: 'Activity'
-            },
-            {
-                md:2,
-                lg: 2,
-                title: 'Type'
-            },
-            {
-                md: 1,
-                lg: 1,
-                title: 'Duration'
-            },
-            {
-                md:3,
-                lg: 3,
-                title: 'Description'
-            },
-            {
-                md:1,
-                lg: 1,
-                title: 'Status'
-            }
-        ]
         return(
             <div>
                 <Grid>
                     <Row className="show-grid">
-                        {headingArray.map(item =>{
+                        {HeadingArray.map(item =>{
                             return (
                             <Col md={item.md} lg={item.lg} className="log-col">
                                 <h4>{item.title}</h4>
@@ -157,7 +131,7 @@ class ActivityLog extends Component{
                         }
                     </Row>
                     <ActivityLogRow timeLog={this.state.timeEnteries}
-                                    logItem={(item, timeLogStatus) => this.addNewLog(item, timeLogStatus)}
+                                    logItem={(item) => this.addNewLog(item)}
                                     newEntry={(newTimeLog,date,newLogStatus) => {this.newEntry(newTimeLog,date,newLogStatus)}}
                                     onClearClick={(allLogs,date) => {this.clearAllLogs(allLogs,date)}}
                                     edittedLog={(editItem,date) => {this.edittedLog(editItem,date)}}
